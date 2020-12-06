@@ -33,7 +33,7 @@ import Control.Monad
 
 statement = headed <|> chained
 
-headed = quStatem <|> ifThenStatem <|> wrongStatem
+headed = quStatem <|> ifThenStatem <|> (wrongStatem </> trueStatem)
   where
     quStatem = liftM2 ($) quChain statement
     ifThenStatem = liftM2 Imp
@@ -41,6 +41,8 @@ headed = quStatem <|> ifThenStatem <|> wrongStatem
       (markupToken Reports.ifThen "then" >> statement)
     wrongStatem =
       mapM_ wdToken ["it", "is", "wrong", "that"] >> fmap Not statement
+    trueStatem =
+      mapM_ wdToken ["it", "is", "true", "that"] >> statement
 
 
 
@@ -357,7 +359,7 @@ setNotion = do
 set = label "set definition" $ symbSet <|> setOf
   where
     setOf = do
-      wdTokenOf ["set", "sets"]; nm <- var -|- hidden; wdToken "of";
+      wdTokenOf ["class", "classes"]; nm <- var -|- hidden; wdToken "of";
       (q, f, u) <- notion >>= single; vnm <- hidden
       vnmDecl <- makeDecl vnm;
       return (id, setForm vnmDecl $ subst (pVar vnm) (fst u) $ q f, [nm])
@@ -368,14 +370,18 @@ set = label "set definition" $ symbSet <|> setOf
     setForm dcl = let nm = (Decl.name dcl, Decl.position dcl) in
       And (zSet zHole) . dAll dcl . Iff (zElem (pVar nm) zHole)
 
-
 symbSetNotation = cndSet </> finSet
   where
-    finSet = exbrc $ do
-      ts <- sTerm `sepByLL1` smTokenOf ","; h <- hidden
+    finSet = do
+      wdToken "\\{"
+      ts <- sTerm `sepByLL1` smTokenOf ","
+      wdToken "\\}"
+      h <- hidden
       return (\tr -> foldr1 Or $ map (zEqu tr) ts, h)
-    cndSet = exbrc $ do
-      (tag, c, t) <- sepFrom; st <- smTokenOf "|" >> statement;
+    cndSet = do
+      wdToken "{"
+      (tag, c, t) <- sepFrom; st <- smTokenOf ":" >> statement;
+      wdToken "}"
       vs <- freeVarPositions t; vsDecl <- mapM makeDecl vs;
       nm <- if isVar t then return $ (trName t, trPosition t) else hidden
       return (\tr -> tag $ c tr `blAnd` mbEqu vsDecl tr t st, nm)

@@ -432,7 +432,7 @@ set :: FTL MNotion
 set = label "set definition" $ symbSet <|> setOf
   where
     setOf = do
-      tokenOf' ["set", "sets"]; nm <- var -|- hidden; token' "of";
+      tokenOf' ["class", "classes"]; nm <- var -|- hidden; token' "of";
       (q, f, u) <- notion >>= single; vnm <- hidden
       vnmDecl <- makeDecl vnm;
       return (id, setFormula vnmDecl $ subst (pVar vnm) (posVarName u) $ q f, Set.singleton nm)

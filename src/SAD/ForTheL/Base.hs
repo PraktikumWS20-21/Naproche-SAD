@@ -69,7 +69,7 @@ initFS = FState
       ([Word ["nonequal"], Word ["to"], Vr], Not . mkTrm EqualityId TermEquality) ]
     primNotions = [
       ([Word ["function","functions"], Nm], mkFun . head),
-      ([Word ["set","sets"], Nm], mkSet . head),
+      ([Word ["class","classes"], Nm], mkSet . head),
       ([Word ["element", "elements"], Nm, Word ["of"], Vr], \(x:m:_) -> mkElem x m),
       ([Word ["object", "objects"], Nm], mkObj . head)]
     primSymbNotions = [ ([Symbol "=", Vr], mkTrm EqualityId TermEquality) ]

@@ -103,15 +103,15 @@ x * (y + z) = (x * y) + (x * z).
 
 \begin{lemma}[MulZero]
 x * 0 = 0 = 0 * x.
-Proof.
+\end{lemma}
+\begin{proof}
     Let us show that x * 0 = 0.
     x * 0 .= x * (0 + 0) (by AddZero) .= (x * 0) + (x * 0) (by AMDistr1).
-    end.
+    end % The fact that the dot after end is missing is only a temporary thing.
     Let us show that 0 * x = 0.
     0 * x .= (0 + 0) * x (by AddZero) .= (0 * x) + (0 * x) (by AMDistr2).
-    end.
-qed.
-\end{lemma}
+    end
+\end{proof}
 \end{forthel}
 
 \end{document}

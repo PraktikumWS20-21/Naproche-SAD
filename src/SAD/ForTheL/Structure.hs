@@ -126,8 +126,9 @@ texTheorem :: FTL ([ProofText], Maybe Text)
 texTheorem = do
   envType <- try . texBegin . addMarkup sectionHeader $ getTokenOf theoremTags
   label <- optionalEnvLabel
+  let link' = noLink <* texEnd (token envType)
   text <- addAssumptions $ topProof $
-            pretypeSentence Affirmation (beginAff >> statement) affirmVars link <* texEnd (token envType)
+            pretypeSentence Affirmation (beginAff >> statement) affirmVars link'
   return (text, label)
   
 
@@ -320,20 +321,26 @@ affirmVars = freeOrOverlapping
 
 data Scheme = None | Short | Raw | Contradiction | InS | InT Formula deriving (Eq, Ord, Show)
 
+-- preMethod generates prover instruction
+-- to be put into the resulting block.
+-- [[let us | we can] (prove | show | demonstrate) 
+-- [by (contradiction | case analysis | induction [on *sTerm*])] that]
 preMethod :: FTL Scheme
 preMethod = optLLx None $ letUs >> dem >> after method that
   where
     dem = markupTokenOf lowlevelHeader ["prove", "show", "demonstrate"]
     that = markupToken lowlevelHeader "that"
 
+-- postMethod generates prover instructions.
+-- (Indeed | \begin{proof}[(by (contradiction | ...))])
 postMethod :: FTL Scheme
 postMethod = optLL1 None $ short <|> explicit
   where
     short = markupToken proofStart "indeed" >> return Short
-    explicit = finish $ markupToken proofStart "proof" >> method
+    explicit = try (texBegin (markupToken proofStart "proof")) >> method
 
 method :: FTL Scheme
-method = optLL1 Raw $ markupToken byAnnotation "by" >> (contradict <|> cases <|> induction)
+method = optLL1 Raw $ parenthesised $ markupToken byAnnotation "by" >> (contradict <|> cases <|> induction)
   where
     contradict = token' "contradiction" >> return Contradiction
     cases = token' "case" >> token' "analysis" >> return Raw
@@ -411,7 +418,9 @@ proofSentence bl = do
 
 proofBody :: Block -> FTL Block
 proofBody bl = do
-  bs <- proofText; ls <- link
+  bs <- proofText
+  ls <- eqLink -- TODO: This is wrong. If using tex, this is correct. But if another form of end proof is used, we
+    -- would actually like to have the dot.
   return bl {Block.body = bs, Block.link = ls ++ Block.link bl}
 
 proofText :: FTL [ProofText]
@@ -423,7 +432,8 @@ proofText =
       narrow assume </>
       proof (narrow $ affirm </> choose </> llDefn) </>
       caseDestinction
-    qed = label "qed" $ markupTokenOf proofEnd ["qed", "end", "trivial", "obvious"] >> return []
+    qed = label "qed" $ (markupTokenOf proofEnd ["qed", "end", "trivial", "obvious"] <|> texEnd (token "proof"))
+             >> return []
     instruction =
       fmap (uncurry ProofTextDrop) instrDrop </>
       fmap (uncurry ProofTextInstr) instr

@@ -70,7 +70,7 @@ initFS = FState
       ([Word ["nonequal"], Word ["to"], Vr], Not . mkTrm EqualityId TermEquality) ]
     primNotions = [
       ([Word ["function","functions"], Nm], mkFun . head),
-      ([Word ["set","sets"], Nm], mkSet . head),
+      ([Word ["class","classes"], Nm], mkSet . head),
       ([Word ["element", "elements"], Nm, Word ["of"], Vr], \(x:m:_) -> mkElem x m),
       ([Word ["object", "objects"], Nm], mkObj . head)]
     primSymbNotions = [ ([Symbol "=", Vr], mkTrm EqualityId TermEquality) ]
@@ -425,7 +425,7 @@ an = tokenOf' ["a", "an"]
 the :: FTL ()
 the = token' "the"
 iff :: FTL ()
-iff = token' "iff" <|> mapM_ token' ["if", "and", "only", "if"]
+iff = token' "iff" <|> mapM_ token' ["if", "and", "only", "if"] <|> mapM_ token' ["when", "and", "only", "when"]
 that :: FTL ()
 that = token' "that"
 standFor :: FTL ()

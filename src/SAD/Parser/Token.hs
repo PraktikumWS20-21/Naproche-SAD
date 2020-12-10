@@ -5,6 +5,7 @@ Tokenization of input.
 -}
 
 {-# LANGUAGE NamedFieldPuns #-}
+{-# LANGUAGE OverloadedStrings #-}
 
 module SAD.Parser.Token
   ( Token (tokenPos, tokenText)
@@ -89,12 +90,8 @@ tokenize commentChars start = posToken start NoWhiteSpaceBefore
     -- Process non-alphanumeric symbol or EOF.
     posToken pos whitespaceBefore s = case Text.uncons s of
       Nothing -> [EOF pos]
-      Just ('\\', rest) -> tok:toks
-        where
-          (name, rest') = Text.span isAlpha rest
-          cmd = Text.cons '\\' name
-          tok = makeToken cmd pos whitespaceBefore
-          toks = posToken (advanceAlong pos cmd) WhiteSpaceBefore rest'
+      Just ('$', rest) -> posToken (advanceAlong pos "$") WhiteSpaceBefore rest
+      Just ('\\', rest) -> posToken (advanceAlong pos "\\") WhiteSpaceBefore rest
       Just (c, _) | elem c commentChars -> tok:toks
         where
           (comment, rest) = Text.break (== '\n') s

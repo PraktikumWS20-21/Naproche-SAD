@@ -432,7 +432,7 @@ proofText =
       narrow assume </>
       proof (narrow $ affirm </> choose </> llDefn) </>
       caseDestinction
-    qed = label "qed" $ (markupTokenOf proofEnd ["qed", "end", "trivial", "obvious"] <|> texEnd (token "proof"))
+    qed = label "qed" $ (texEnd (token "proof") <|> markupTokenOf proofEnd ["qed", "end", "trivial", "obvious"])
              >> return []
     instruction =
       fmap (uncurry ProofTextDrop) instrDrop </>

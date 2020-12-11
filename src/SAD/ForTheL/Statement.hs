@@ -432,7 +432,7 @@ set :: FTL MNotion
 set = label "set definition" $ symbSet <|> setOf
   where
     setOf = do
-      tokenOf' ["set", "sets"]; nm <- var -|- hidden; token' "of";
+      tokenOf' ["class", "classes"]; nm <- var -|- hidden; token' "of";
       (q, f, u) <- notion >>= single; vnm <- hidden
       vnmDecl <- makeDecl vnm;
       return (id, setFormula vnmDecl $ subst (pVar vnm) (posVarName u) $ q f, Set.singleton nm)
@@ -452,9 +452,9 @@ symbSetNotation = cndSet </> finSet
       h <- hidden
       pure (\tr -> foldr1 Or $ map (mkEquality tr) ts, h)
     cndSet = braced $ do
-      (tag, c, t) <- sepFrom
-      st <- token "|" >> statement;
-      vs <- freeVars t
+      (tag, c, t) <- sepFrom;
+      st <- (token "|" <|> token ":") >> statement;
+      vs <- freeVars t;
       vsDecl <- makeDecls $ fvToVarSet vs;
       nm <- if isVar t then pure $ PosVar (varName t) (varPosition t) else hidden
       pure (\tr -> tag $ c tr `blAnd` mbEqu vsDecl tr t st, nm)

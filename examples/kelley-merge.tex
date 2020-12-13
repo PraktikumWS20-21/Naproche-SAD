@@ -1,0 +1,935 @@
+% Kelley Morse Theory of Sets and Classes
+
+% We formalize the 
+
+% Appendix: ELEMENTARY SET THEORY 
+
+% of John L. Kelley 
+% GENERAL TOPOLOGY 
+% D. Van Nostrand Company Inc. 1955
+%
+% The appendix develops what is known as Kelley-Morse
+% class theory (KM). 
+% Kelley writes: "The system of axioms adopted is a variant
+% of systems of Skolem and of A.P.Morse and owes much to
+% the Hilbert-Bernays-von Neumann system as formulated
+% by Gödel."
+
+% This file covers the first 56 top level sections of the appendix.
+% It uses SADs inbuilt class notion and mechanisms to model the
+% classes of Kelley. We have built the class notion into 
+% Naproche-SAD by replacing "set" by "class"
+
+% This file checks in ~ 1 min on my laptop.
+
+\documentclass[a4paper,draft]{amsproc}
+\title{\textbf{Kelley}}
+
+\date{}
+\begin{document}
+
+\theoremstyle{plain}
+ \newtheorem{theorem}{Theorem}
+ \newtheorem*{theorem*}{Theorem}
+ \newtheorem{lemma}[theorem]{Theorem}
+ \newtheorem*{lemma*}{Theorem}
+ \newtheorem{proposition}[theorem]{Theorem}
+ \newtheorem*{proposition*}{Theorem}
+\theoremstyle{definition}
+ \newtheorem{example}[theorem]{Example}
+ \newtheorem*{example*}{Example}
+ \newtheorem{definition}[theorem]{Definition}
+ \newtheorem*{definition*}{Definition}
+ \newtheorem{signature}[theorem]{Signature}
+ \newtheorem*{signature*}{Signature}
+\theoremstyle{remark}
+ \newtheorem{remark[theorem]}{Remark}
+ \newtheorem*{remark*}{Remark}
+ \newtheorem{notation}[theorem]{Notation}
+ \newtheorem*{notation*}{Notation}
+\theoremstyle{axiom}
+ \newtheorem{axiom}{Axiom}
+ \newtheorem*{axiom*}{Axiom}
+ \numberwithin{equation}{section}
+
+\newenvironment{forthel}{}{}
+\maketitle
+
+\newcommand{\cal}[1]{\mathcal{#1}}
+\newcommand{\domain}[1]{\textnormal{domain}}
+\newcommand{\range}[1]{\textnormal{range}}
+%\newcommand{xxx}{\} % geht das?
+
+\begin{forthel}
+[synonym element/-s]
+
+\begin{signature}[ElmSort]
+An element is a notion.
+\end{signature}
+
+% section not yet supported?
+%\section{The Classification Axiom Scheme}
+
+Let $x, y, z, u, v, a, b, c, d, e$ stand for classes.
+
+Let $a \neq b$ stand for $a != b$.
+Let $a \in b$ stand for $a$ is an element of $b$.
+
+% Axiom I. Axiom of extent.
+\begin{axiom}[I] 
+For each $x, y $ 
+$x = y$ if and only if for each $z$ $z \in x$ 
+when and only when $z \in y$.
+\end{axiom}
+
+% II Classification axiom-scheme corresponds to the way
+% "classifications", i.e., abstraction terms are handled
+% in Naproche-SAD
+
+[synonym set/-s]
+
+% Definition 1
+\begin{definition}[1]
+a set is a class $x$ such that for some class $y$ $x \in y$.
+%x is a set iff for some y x \in y.
+\end{definition}
+
+%\section{ELEMENTARY ALGEBRA OF CLASSES}
+
+% Definition 2
+\begin{definition}[2] 
+$x \cup y = \{$set $z : z \in x or z \in y \}$.
+\end{definition}
+
+% Definition 3
+\begin{definition}[3] 
+$x \cap y = \{$set $u : u \in x and u \in y \}$.
+\end{definition}
+
+Let the union of x and y stand for x \cup y.
+Let the intersection of x and y stand for x \cap y.
+
+% Theorem 4
+\begin{theorem}[4]
+($z \in x \cup y$ iff $z \in x$ or $z \in y$)
+and ($z \in x \cap y$ iff $z \in x$ and $z \in y$).
+\end{theorem}
+
+% Theorem 5
+\begin{theorem}[5]
+$x \cup x = x$ and $x \cap x = x$.
+\end{theorem}
+
+% Theorem 6
+\begin{theorem}[6]
+$x \cup y$ = $y \cup x$ and $x \cap y = y \cap x$.
+\end{theorem}
+
+% Theorem 7
+\begin{theorem}[7]
+$(x \cup y) \cup z = x \cup (y \cup z)$ 
+and $(x \cap y) \cap z = x \cap (y \cap z)$.
+\end{theorem}
+
+% Theorem 8
+\begin{theorem}[8]
+$x \cap (y \cup z) = (x \cap y) \cup (x \cap z)$
+and $x \cup (y \cap z) = (x \cup y) \cap (x \cup z)$.
+\end{theorem}
+
+% 9 Definition, as a parser directive.
+% Definition 9
+Let $a \notin b$ stand for $a$ is not an element of $b$.
+
+% Definition 10
+\begin{definition}[10] 
+$\sim x = \{$set $y : y \notin x\}$.
+\end{definition}
+Let the complement of x stand for \sim x.
+
+% Theorem 11
+\begin{theorem}[11]
+$\sim (\sim x) = x$.
+\end{theorem}
+
+% Theorem 12 (De Morgan)
+\begin{theorem}[12]
+\sim (x \cup y) = (\sim x) \cap (\sim y) 
+and \sim (x \cap y) = (\sim x) \cup (\sim y).
+\end{theorem}
+
+% Theorem 13
+\begin{definition}[13] x \sim y = x \cap (\sim y).\end{definition}
+
+% Theorem 14
+\begin{theorem}[14]
+x \cap (y \sim z) = (x \cap y) \sim z.
+\end{theorem}
+
+% Definition 15
+\begin{definition}[15] 
+0 = \{set x : x \neq x\}.
+\end{definition}
+Let the void class stand for 0.
+Let zero stand for 0.
+
+% Theorem 16
+\begin{theorem}[16]
+x \notin 0.
+\end{theorem}
+
+% Theorem 17
+\begin{theorem}[17]
+0 \cup x = x and 0 \cap x = 0.
+\end{theorem}
+
+% Definition 18
+\begin{definition}[18]
+\cal{U} = \{set x : x = x\}.
+\end{definition}
+Let the universe stand for \cal{U}.
+
+% Theorem 19
+\begin{theorem}[19]
+x \in \cal{U} if and only if x is a set.
+\end{theorem}
+
+% Theorem 20
+\begin{theorem}[20]
+x \cup \cal{U} = \cal{U} and x \cap \cal{U} = x.
+\end{theorem}
+
+% Theorem 21
+\begin{theorem}[21]
+\sim 0 = \cal{U} and \sim \cal{U} = 0.
+\end{theorem}
+
+% Definition 22
+\begin{definition}[22]
+\bigcap x = \{set z : for each y if y \in x then z \in y\}.
+\end{definition}
+
+% Definition 23
+\begin{definition}[23]
+\bigcup x = \{set z : for some y (z \in y and y \in x)\}.
+\end{definition}
+
+Let the intersection of x stand for \bigcap x.
+Let the union of x stand for \bigcup x.
+
+% Theorem 24
+\begin{theorem}[24]
+\bigcap 0 = \cal{U} and \bigcup 0 = 0.
+\end{theorem}
+
+% Definition 25
+\begin{definition}[25]
+a subclass of y is a class x such that for each class z if z \in x then z \in y.
+\end{definition}
+
+Let x \subset y stand for x is a subclass of y.
+Let x is contained \in y stand for x \subset y.
+
+% Unnumbered
+\begin{lemma}
+0 \subset 0 and 0 \notin 0.
+\end{lemma}
+
+% Theorem 26
+\begin{theorem}[26]
+0 \subset x and x \subset \cal{U}.
+\end{theorem}
+
+% Theorem 27
+\begin{theorem}[27]
+x = y iff x \subset y and y \subset x.
+\end{theorem}
+
+% Theorem 28
+\begin{theorem}[28]
+If x \subset y and y \subset z then x \subset z.
+\end{theorem}
+
+% Theorem 29
+\begin{theorem}[29]
+x \subset y iff x \cup y = y.
+\end{theorem}
+
+% Theorem 30
+\begin{theorem}[30]
+x \subset y iff x \cap y = x.
+\end{theorem}
+
+% Theorem 31
+\begin{theorem}[31]
+If x \subset y then \bigcup x \subset \bigcup y
+and \bigcap y \subset \bigcap x.
+\end{theorem}
+
+% Theorem 32
+\begin{theorem}[32]
+If x \in y then x \subset \bigcup y 
+and \bigcap y \subset x.
+\end{theorem}
+
+%\section{EXISTENCE OF SETS}
+
+% Axiom of subsets.
+\begin{axiom}
+If x is a set then there is a set y such that for each
+z if z \subset x then z \in y.
+\end{axiom}
+
+% This axiom is a kind of powerclass axiom, where the powerclass
+% also has all subCLASSES as elements.
+
+% Theorem 33
+\begin{theorem}[33]
+If x is a set and z \subset x then z is a set.
+\end{theorem}
+
+% Theorem 34
+\begin{theorem}[34]
+0 = \bigcap \cal{U} and \cal{U} = \bigcup \cal{U}.
+\end{theorem}
+
+% Theorem 35
+\begin{theorem}[35]
+If x \neq 0 then \bigcap x is a set.
+\end{theorem}
+
+% Definition 36
+\begin{definition}[36]
+2^{x} = \{set y : y \subset x\}.
+\end{definition}
+
+% Theorem 37
+\begin{theorem}[37]
+\cal{U} = 2^{\cal{U}}.
+\end{theorem}
+
+% Theorem 38
+\begin{theorem}[38]
+If x is a set then 2^{x} is a set and for each y  y \subset x iff y \in 2^{x}.
+\end{theorem}
+\begin{proof} Let x be a set.
+Take a set y such that for each z 
+if z \subset x then z \in y.
+2^{x} \subset y.
+\end{proof}
+
+% The Russell paradox.
+% Unnumbered
+\begin{definition}
+\cal{R} = \{set x : x \notin x\}.
+\end{definition}
+
+% Unnumbered
+\begin{theorem}
+\cal{R} is not a set.
+\end{theorem}
+
+% Theorem 39
+\begin{theorem}[39]
+\cal{U} is not a set.
+\end{theorem}
+
+% Definition 40
+\begin{definition}[40]
+<x> = \{set z : if x \in \cal{U} then z = x\}.
+\end{definition}
+Let the singleton of x stand for <x>.
+
+% Before We used <x> instead of {x} since {x} was an inbuilt 
+% set notation   
+
+% Theorem 41
+\begin{theorem}[41]
+If x is a set then for each y y \in <x> iff y = x.
+\end{theorem}
+
+% Theorem 42
+\begin{theorem}[42]
+If x is a set then <x> is a set.
+\end{theorem}
+\begin{proof} Let x be a set. Then <x> \subset 2^{x} 
+and 2^{x} is a set.
+\end{proof}
+
+% Theorem 43
+\begin{theorem}[43]
+<x> = \cal{U} if and only if x is not a set.
+\end{theorem}
+
+% Theorem 44a
+\begin{theorem}[44a]
+If x is a set then \bigcap <x> = x 
+and \bigcup <x> = x.
+\end{theorem}
+
+% Theorem 44b
+\begin{theorem}[44b]
+If x is not a set then \bigcap <x> = 0
+and \bigcup <x> = \cal{U}.
+\end{theorem}
+
+% Axiom IV. 
+\begin{axiom}[IV]
+If x is a set and y is a set then x \cup y is a set.
+\end{axiom}
+
+% Definition 45
+\begin{definition}[45] <x,y> = <x> \cup <y>.\end{definition}
+Let the unordered pair of x and y stand for <x,y>.
+
+% The following has been a problem before:
+% We use <x,y> instead of {x y} because Naproche-SAD requires
+% some symbolic or textual material between the variables
+% x and y. We use {x;y} instead of {x,y} because the latter
+% notion is an inbuilt set notation of Naproche-SAD.
+
+% Theorem 46a
+\begin{theorem}[46a]
+If x is a set and y is a set 
+then <x,y> is a set and (z \in <x,y> iff z=x or z=y). 
+\end{theorem}
+
+% Theorem 46b
+\begin{theorem}[46b]
+(<x,y>) = \cal{U} if and only if (x is not a set or y is not a set).
+\end{theorem}
+
+% Theorem 47a
+\begin{theorem}[47a]
+If x,y are sets then \bigcap <x,y> = x \cap y
+and \bigcup <x,y> = x \cup y.
+\end{theorem}
+\begin{proof}
+Let x,y be sets.
+\bigcup <x,y> \subset x \cup y.
+x \cup y \subset \bigcup <x,y>.
+\end{proof}
+
+% Theorem 47b
+\begin{theorem}[47b]
+If x is not a set or y is not a set then
+\bigcap <x,y> = 0 and \bigcup <x,y> = \cal{U}.
+\end{theorem}
+
+%\section{ORDERED PAIRS: RELATIONS}
+
+% Definition 48
+\begin{definition}[48] [x,y] = \{<x>,<x,y>\}.\end{definition}
+Let the ordered pair of x and y stand for [x,y].
+
+% Theorem 49a
+\begin{theorem}[49a]
+[x,y] is a set if and only if x is a set and y is a set.
+\end{theorem}
+
+% Theorem 49b
+\begin{theorem}[49b]
+If [x,y] is not a set then [x,y] = \cal{U}.
+\end{theorem}
+
+% Theorem 50a
+\begin{theorem}[50a]
+If x and y are sets then 
+  (\bigcup [x,y]) = (<x,y>) and
+  (\bigcap [x,y]) = <x> and
+  (\bigcup \bigcap [x,y]) = x and
+  (\bigcap \bigcap [x,y]) = x and
+  (\bigcup \bigcup [x,y]) = x \cup y and
+  (\bigcap \bigcup [x,y]) = x \cap y.
+\end{theorem}
+
+% Theorem 50b
+\begin{theorem}[50b]
+If x is not a set or y is not a set then
+  \bigcup \bigcap [x,y] = 0 and
+  \bigcap \bigcap [x,y] = \cal{U} and
+  \bigcup \bigcup [x,y] = \cal{U} and
+  \bigcap \bigcup [x,y] = 0.
+\end{theorem}
+
+% Definition 51
+\begin{definition}[51] 1^{st} coord z = \bigcap \bigcap z.\end{definition}
+
+% Definition 52
+\begin{definition}[52] 2^{nd} coord z = (\bigcap \bigcup z) \cup 
+((\bigcup \bigcup z) \sim \bigcup \bigcap z).\end{definition} 
+Let the first coordinate of z stand for 1^{st} coord z.
+Let the second coordinate of z stand for 2^{nd} coord z.
+
+% Theorem 53
+\begin{theorem}[53]
+2^{nd} coord \cal{U} = \cal{U}.
+\end{theorem}
+
+% Theorem 54a
+\begin{theorem}[54a]
+If x and y are sets 
+then 1^{st} coord [x,y] = x and 2^{nd} coord [x,y] = y.
+\end{theorem}
+\begin{proof}
+Let x and y be sets.
+2^{nd} coord [x,y] = (\bigcap \bigcup [x,y]) \cup 
+((\bigcup \bigcup [x,y]) \sim \bigcup \bigcap [x,y])
+= (x \cap y) \cup ((x \cup y) \sim x)
+= y.
+\end{proof}
+
+% Theorem 54b
+\begin{theorem}[54b]
+If x is not a set or y is not a set then
+1^{st} coord [x,y] = \cal{U} and 
+2^{nd} coord [x,y] = \cal{U}.
+\end{theorem}
+
+% Theorem 55
+\begin{theorem}[55]
+If x and y are sets and [x,y] = [u,v] then
+x = u and y = v.
+\end{theorem}
+
+% We can interpret \cal{U} to mean undefined.
+% Then ( , ) produces a a set or undefined.
+% We can instead extend the signature (our language)
+% by an elementary symbol ( , ), satisfying standard axioms ... .
+% Ideally, we would like ( , ) to be an "object" and
+% not a set. Sets will also be objects.
+
+[synonym relation/-s]
+
+% Definition 56
+\begin{definition}[56] 
+A relation is a class r such that 
+%A class r is a relation if and only if 
+for each element z of r
+there is x and y such that z = [x,y].
+\end{definition}
+
+Let r, s, t stand for relations.
+
+% Definition 57
+\begin{definition}[57]
+r \circ s = {[x,z] | x, z are objects and there exists an object b 
+such that [x,b] \in s and [b,z] \in r}. 
+\end{definition}
+
+% Theorem 58
+\begin{theorem}[58]
+(r \circ s) \circ t = r \circ (s \circ t).
+\end{theorem}
+\begin{proof}
+Let r,s,t be relations.
+(r \circ s) \circ t \subset r \circ (s \circ t) and
+r \circ (s \circ t) \subset (r \circ s) \circ t.
+\end{proof}
+
+% Theorem 59a
+\begin{theorem}[59a]
+r \circ (s \cup t) = (r \circ s) \cup (r \circ t).
+\end{theorem}
+\begin{proof}
+r \circ (s \cup t) \subset (r \circ s) \cup (r \circ t).
+(r \circ s) \cup (r \circ t) \subset r \circ (s \cup t).
+\end{proof}
+
+% Theorem 59b
+\begin{theorem}[59b]
+r \circ (s \cap t) \subset (r \circ s) \cap (r \circ t).
+\end{theorem}
+
+% Definition 60
+\begin{definition}[60]
+r^{-1} = {[b,a] | a, b are objects and [a,b] \in r}.
+\end{definition}
+Let the relation inverse to r stand for r^{-1}.
+
+% Unnumbered
+\begin{lemma}
+r^{-1} is a relation.
+\end{lemma}
+
+% Theorem 61
+\begin{theorem}[61]
+(r^{-1})^{-1} = r.
+\end{theorem}
+\begin{proof}
+r \subset (r^{-1})^{-1}.
+(r^{-1})^{-1} \subset r.
+\end{proof}
+
+% Lemma 62a
+\begin{lemma}[62a]
+Assume r \subset s. Then r^{-1} \subset s^{-1}.
+\end{lemma}
+
+%[/prove]
+
+% Lemma 62b
+\begin{lemma}[62b]
+(r \circ s)^{-1} \subset (s^{-1}) \circ (r^{-1}).
+\end{lemma}
+\begin{proof}
+Let u \in (r \circ s)^{-1}.
+Take c and a such that u = [c,a].
+Take an object b such that ([a,b] \in s and [b,c] \in r).
+Indeed [a,c] \in r \circ s.
+[b,a] \in s^{-1} and [c,b] \in r^{-1}.
+Then [c,a] \in (s^{-1}) \circ (r^{-1}).
+\end{proof}
+
+% Unnumbered
+\begin{lemma}
+(s^{-1}) \circ (r^{-1}) \subset (r \circ s)^{-1}.
+\end{lemma}
+\begin{proof}
+Let r,s be relations.
+((s^{-1}) \circ (r^{-1}))^{-1} \subset ((r^{-1})^{-1}) \circ ((s^{-1})^{-1}) (by 62b).
+((s^{-1}) \circ (r^{-1}))^{-1} \subset r \circ s (by 61).
+(((s^{-1}) \circ (r^{-1}))^{-1})^{-1} \subset (r \circ s)^{-1} (by 62a).
+(s^{-1}) \circ (r^{-1}) \subset (r \circ s)^{-1} (by 61).
+\end{proof}
+
+% Theorem 62
+\begin{theorem}[62]
+(r \circ s)^{-1} = (s^{-1}) \circ (r^{-1}).
+\end{theorem}
+\begin{proof}
+Let r,s be relations.
+(r \circ s)^{-1} \subset (s^{-1}) \circ (r^{-1}).
+(s^{-1}) \circ (r^{-1}) \subset (r \circ s)^{-1}.
+\end{proof}
+
+% Functions
+
+% Since "function" is predefined in SAD3, we use the word "map" instead.
+
+%[/prove]
+
+[synonym map/-s]
+% Definition 63
+\begin{definition}[63]
+A map is a relation f such that for each a, b, c
+if [a,b] \in f and [a,c] \in f then b = c.
+\end{definition}
+
+Let f, g stand for maps.
+
+% Theorem 64
+\begin{theorem}[64]
+If f, g are maps then f \circ g is a map.
+\end{theorem}
+
+% Definition 65
+\begin{definition}[65]
+\domain x = \{object u |  there exists an object v such that [u,v] \in x\}.
+\end{definition}
+
+% Definition 66
+\begin{definition}[66]
+\range x = \{object v |  there exists an object u such that [u,v] \in x\}.
+\end{definition}
+
+% Theorem 67
+\begin{theorem}[67]
+\domain \cal{U} = \cal{U} and \range \cal{U} = \cal{U}.
+\end{theorem}
+\begin{proof}
+Let x be a class.
+If x \in \cal{U} then (x,0), (0,x) \in \cal{U}.
+x \in \domain \cal{U} and x \in \range \cal{U}.
+\end{proof}
+
+% Signature 68
+\begin{signature}[68]
+Let f be a map. Let u \in \domain f.
+The value of f at u is an object v such that [u,v] \in f.
+\end{signature}
+Let f(u) stand for the value of f at u.
+
+
+% Theorem 69
+\begin{theorem}[69a]
+If x \notin \domain f then f(x) = \cal{U}.
+\end{theorem}
+\begin{proof}
+If x \notin \domain f 
+then \{class y | [x,y] \in f\} = 0 and f(x) = \cal{U} (by 24).
+\end{proof}
+
+\begin{theorem}[69b]
+If x \in \domain f then f(x) \in \cal{U}.
+\end{theorem}
+%\begin{proof}
+%If x \in \domain f 
+%then \{class y | [x,y] \in f\} \neq 0    % \neq 0 nicht möglich?
+%and f(x) is a set (by 35).
+%\end{proof}
+
+% Theorem 70
+\begin{theorem}[70]
+Let f be a map. Then f = \{[x,y] : y = f(x)\}.
+%Then f = {[u,f(u)] : u \in \domain f}.
+\end{theorem}
+
+% Theorem 71
+\begin{theorem}[71]
+Assume \domain f = \domain g and for all elements u of \domain f
+%u \in \domain f 
+f(u) = g(u). Then f = g.
+\end{theorem}
+\begin{proof}
+Let us show that f \subset g.
+\begin{proof}
+Let w \in f. 
+Then w \in g. 
+\end{proof}
+%end.
+Let us show that g \subset f.
+\begin{proof}
+Let w \in g.  
+Take objects u, v such that w=[u,v].
+u \in \domain g and v = g(u).
+Then u \in \domain f and v = f(u).
+Then w \in f. 
+\end{proof} %end.
+\end{proof}
+
+% Axiom of substitution
+\begin{axiom}[V]
+Let f be a map. If \domain f is a set then \range f is a set.
+\end{axiom}
+
+% Axiom of amalgamation
+\begin{axiom}[VI]
+If x is a set then \bigcup x is a set.
+\end{axiom}
+
+% Definition 72
+\begin{definition}[72]
+ x \times y = \{[u,v] : u \in x and v \in y\}.
+\end{definition}
+
+% Theorem 73
+\begin {theorem}[73]
+If u,v are sets then <u> \times <v> is a set.
+\end{theorem}
+
+% Theorem 74
+\begin{theorem}[74]
+If x,y are sets then x \times y is a set.
+\end{theorem}
+\begin{proof}
+Let f be a map such that \domain f = x and
+f(u) = <u> \times y for every element u of x.
+\range f is a set.
+\range f = \{class z : for some class u (u \in x and z = (<u> \times y))\}.
+Consequently \bigcup \range f = x \times y.
+\end{proof}
+
+% Theorem 75
+\begin{theorem}[75]
+If f is a map and \domain f is a set 
+then f is a set.\end{theorem}
+\begin{proof}
+f \subset (\domain f \times \range f).
+\end{proof}
+
+% Definition 76
+\begin{definition}[76]
+y^{x} = \{map f | \domain f = x and \range f \subset y\}.
+\end{definition}
+
+% Theorem 77
+\begin{theorem}[77]
+If x,y are sets then y^{x} is a set.
+\end{theorem}
+\begin{proof}
+Let f be map.
+If f \in y^{x} then f \subset x \times y.
+f \in 2^{x \times y} (by 38).
+2^{x \times y} is a set.
+y^{x} \subset 2^{x \times y}.
+y^{x} is a set.
+\end{proof}
+
+% Definition 78
+\begin{definition}[78]
+f is on x if and only if f is a map and x = \domain f.
+\end{definition}
+
+% Definition 79
+\begin{definition}[79]
+f is to y if and only if f is a map such and \range f \subset y.
+\end{definition}
+
+% Definition 80
+\begin{definition}[80]
+f is onto y if and only if f is a map and \range f = y.
+\end{definition}
+
+\end{forthel}
+
+\section{WELL ORDERING}
+\begin{forthel}
+
+Let r stand for a relation.
+
+% Definition 81
+% x \sim_{r} y
+Let x (r) y stand for [x,y] \in r.
+
+% Definition 82
+\begin{definition}[82]
+r connects x iff for all elements u,v of x u (r) v or v (r) u or v = u.
+\end{definition}
+
+% Definition 83
+\begin{definition}[83]
+r is transitive in x iff for all elements u,v,w of x if u (r) v and v (r) w then u (r) w.
+\end{definition}
+
+% Definition 84
+\begin{definition}[84]
+r is asymmetric in x iff for all elements u,v of x if u (r) v then not v (r) u.
+\end{definition}
+
+% Definition 85
+% x neq y iff it is false that x = y.
+
+\begin{definition}[86]
+z minimizes x in r if and only if (z \in x and for each element y of x not(y (r) z)).
+\end{definition}
+
+[synonym wellorder/-s]
+% Definition 87
+\begin{definition}[87]
+r wellorders x if and only if r connects x and for each subclass y of x such that y \neq 0
+there exists an object z such that z minimizes y in r.
+\end{definition}
+
+% Theorem 88a
+\begin{theorem}[88a]
+If r wellorders x then r is asymmetric in x.
+\end{theorem}
+\begin{proof}
+Assume r wellorders x.
+Let u \in x and v \in x.
+Assume u (r) v and v (r) u.
+Then <u,v> \subset x.
+Take an object z such that z minimizes <u,v> in r.
+z = u or z = v.
+Then not v (r) u or not u (r) v.
+Contradiction. 
+Then r is asymmetric in x.
+\end{proof}
+
+% Theorem 88b
+\begin{theorem}[88b]
+If r wellorders x then r is transitive in x.
+\end{theorem}
+\begin{proof}
+Assume r wellorders x.
+Assume that r is not transitive in x.
+Take elements u,v,w of x such that 
+u (r) v and v (r) w and not u (r) w.
+u \neq w. Indeed r is asymmetric in x.
+w (r) u.
+There is no object a such that a minimizes (<u> \cup <v>) \cup <w> in r.
+(<u> \cup <v>) \cup <w> \subset x.
+Take an object b such that b minimizes (<u> \cup <v>) \cup <w> in r.
+Contradiction.
+\end{proof}
+
+[synonym section/-s]
+% Definition 89
+\begin{definition}[89]
+A section of x in r is a set y such that y subset x and r wellorders x
+and for each objects u,v such that u \in x and v \in y and u (r) v u \in y.
+\end{definition}
+
+% Theorem 90
+\begin{theorem}[90]
+If z \neq 0 and every element of z is a section of x in r then \bigcup z and \bigcap z are sections of x in r.
+\end{theorem}
+
+% Theorem 91
+\begin{theorem}[91]
+If y is a section of x in r and y \neq x then
+y = \{object u | u \in x and u (r) v\} for some element v of x.
+\end{theorem}
+\begin{proof}
+Let y be a section of x in r and y \neq x.
+Take an object v such that v minimizes x in r and x (r) y.
+\end{proof}
+
+% Theorem 92
+\begin{theorem}[92]
+If x and y are sections of z in r then x \subset y or y \subset x.
+\end{theorem}
+
+[synonym orderpreserve/-s]
+% Definition 93
+\begin{definition}[93]
+f orderpreserves r and s iff r wellorders \domain f and s wellorders \range f
+and f(u) (s) f(v) for all elements u,v of \domain f such that u (r) v.
+\end{definition}
+
+% Theorem 94
+\begin{theorem}[94]
+If x is a section of y in r and f orderpreserves r and r and f is on x and f is to y
+then for each element u of x not f(u) (r) u.
+\end{theorem}
+
+% Definition 95
+\begin{definition}[95]
+A oneonefunction is a map f such that f^{-1} is a map.
+\end{definition}
+
+% Unnumbered
+\begin{lemma}
+f is a oneonefunction iff for all elements x,y of \domain f such that x \neq y f(x) \neq f(y).
+\end{lemma}
+
+% Theorem 96a
+\begin{theorem}[96a]
+If f orderpreserves r and s then f is a oneonefunction.
+\end{theorem}
+
+% Theorem 96b
+\begin{theorem}[96b]
+If f orderpreserves r and s then f^{-1} orderpreserves s and r.
+\end{theorem}
+
+% Theorem 97
+\begin{theorem}[97]
+If f and g orderpreserve r and s and \domain f,\domain g are sections of x in r
+and \range f,\range g are sections of y in s then f \subset g or g \subset f.
+\end{theorem}
+
+% Definition 98
+\begin{definition}[98]
+f orderpreserves r and s in x and y iff r wellorders x and s wellorders y and
+f orderpreserves r and s and \domain f is a section of y in s.
+\end{definition}
+
+% Theorem 99
+\begin{theorem}[99]
+If r wellorders x and s wellorders y then there exists a map f such that
+f orderpreserves r and s in x and y and (\domain f = x or \range f = y).
+\end{theorem}
+
+% Theorem 100
+\begin{theorem}[100]
+If r wellorders x and s wellorders y and x is a set and y is not a set
+then there exists a %unique
+ map f such that f orderpreserves r and s in x and y
+and \domain f = x.
+\end{theorem}
+
+\end{forthel}
+
+\end{document}

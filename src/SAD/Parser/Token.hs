@@ -91,6 +91,7 @@ tokenize commentChars start = posToken start NoWhiteSpaceBefore
     posToken pos whitespaceBefore s = case Text.uncons s of
       Nothing -> [EOF pos]
       Just ('$', rest) -> posToken (advanceAlong pos "$") WhiteSpaceBefore rest
+      Just ('"', rest) -> posToken (advanceAlong pos "\"") WhiteSpaceBefore rest
       Just ('\\', rest) -> posToken (advanceAlong pos "\\") WhiteSpaceBefore rest
       Just (c, _) | elem c commentChars -> tok:toks
         where

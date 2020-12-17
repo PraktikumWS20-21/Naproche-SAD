@@ -33,7 +33,7 @@ termDomain :: TermName
 termDomain = TermSymbolic "zDzozmlpdtrp"
 
 termSet :: TermName
-termSet = TermNotion "Set"
+termSet = TermNotion "Class"
 
 termElement :: TermName
 termElement = TermNotion "ElementOf"

@@ -121,9 +121,11 @@ $x \cup x = x$ and $x \cap x = x$.
 \end{theorem}
 
 % Theorem 6
+[prove off]
 \begin{theorem}[6]
 $x \cup y$ = $y \cup x$ and $x \cap y = y \cap x$.
 \end{theorem}
+[/prove]
 
 % Theorem 7
 \begin{theorem}[7]
@@ -228,7 +230,7 @@ a subclass of y is a class x such that for each class z if z \in x then z \in y.
 \end{definition}
 
 Let x \subset y stand for x is a subclass of y.
-Let x is contained \in y stand for x \subset y.
+Let x is contained in y stand for x \subset y.
 
 % Unnumbered
 \begin{lemma}
@@ -800,6 +802,7 @@ r is asymmetric in x iff for all elements u,v of x if u (r) v then not v (r) u.
 % Definition 85
 % x neq y iff it is false that x = y.
 
+Let $x$ denote a class.
 \begin{definition}[86]
 z minimizes x in r if and only if (z \in x and for each element y of x not(y (r) z)).
 \end{definition}
@@ -928,6 +931,190 @@ If r wellorders x and s wellorders y and x is a set and y is not a set
 then there exists a %unique
  map f such that f orderpreserves r and s in x and y
 and \domain f = x.
+\end{theorem}
+
+\end{forthel}
+
+\section{ORDINALS}
+\begin{forthel}
+
+Let $x, y$ denote classes.
+% AXIOM VII: Axiom of regularity
+\begin{axiom}
+If $x \neq 0$ then there is an element $y$ of $x$ such that $x \cap y = 0$.
+\end{axiom}
+
+% Theorem 101
+\begin{theorem}[101]
+$x \notin x$.
+\end{theorem}
+
+% Theorem 102
+\begin{theorem}[102]
+Not ($x \in y$ and $y \in x$).
+\end{theorem}
+
+% Definition 103
+\begin{definition}[103]
+$E = \{[x,y] : x \in y\}$.
+\end{definition}
+
+% Unnumbered
+\begin{lemma}
+If $x \in y$ and $y$ is not a set then $[x,y] = \cal{U}$ and $[x,y] \notin E$.
+\end{lemma}
+
+% Theorem 104
+\begin{theorem}[104]
+$E$ is not a set.
+\end{theorem}
+
+% Definition 105
+\begin{definition}[105]
+A fullclass is a class $x$ such that each element of $x$ is contained in $x$.
+\end{definition}
+
+% Unnumbered
+\begin{lemma}
+$x$ is a fullclass iff each element of each element of $x$ is an element of $x$.
+\end{lemma}
+
+[synonym ordinal/-s]
+% Definition 106
+\begin{definition}[106]
+An ordinal is a class $x$ such that $E$ connects $x$ and $x$ is a fullclass.
+\end{definition}
+
+% Theorem 107
+\begin{theorem}[107]
+If $x$ is an ordinal then $E$ wellorders $x$.
+\end{theorem}
+
+% Theorem 108
+\begin{theorem}[108]
+If $x$ is an ordinal and $y \subset x$ and $y \neq x$ and $y$ is a fullclass then $y \in x$.
+\end{theorem}
+
+% Theorem 109
+\begin{theorem}[109]
+If $x$ is an ordinal and $y$ is an ordinal then $x \subset y$ or $y \subset x$.
+\end{theorem}
+
+% Theorem 110
+\begin{theorem}[110]
+If $x$ is an ordinal and $y$ is an ordinal then $x \in y$ or $y \in x$ or $x = y$.
+\end{theorem}
+
+% Theorem 111
+\begin{theorem}[111]
+If $x$ is an ordinal and $y \in x$ then $y$ is an ordinal.
+\end{theorem}
+
+% Definition 112
+\begin{definition}
+$R = \{$class $x : x$ is an ordinal$\}$.
+\end{definition}
+
+% Theorem 113
+\begin{theorem}[113]
+$R$ is an ordinal and $R$ is not a set.
+\end{theorem}
+
+% Theorem 114
+\begin{theorem}[114]
+Each section of $R$ in $E$ is an ordinal.
+\end{theorem}
+
+% Definition 115
+\begin{definition}[115]
+An ordinal number is a class $x$ such that $x \in R$.
+\end{definition}
+
+% Definition 116
+\begin{definition}[116]
+$x < y$ iff $x \in y$.
+\end{definition}
+
+% Definition 117
+\begin{definition}[117]
+$x \leqq y$ iff $x \in y$ or $x = y$.
+\end{definition}
+
+% Theorem 118
+\begin{theorem}[118]
+If $x, y$ are ordinals then $x \leqq y$ iff $x \subset y$.
+\end{theorem}
+
+% Theorem 119
+\begin{theorem}[119]
+If $x$ is an ordinal then $x = \{$ class $y : y \in R$ and $y < x\}$.
+\end{theorem}
+
+% Theorem 120
+\begin{theorem}[120]
+If $x \subset R$ then $\bigcup x$ is an ordinal.
+\end{theorem}
+
+% Theorem 121
+\begin{theorem}[121]
+If $x \subset R$ and $x \neq 0$ then $\bigcap x \in x$.
+\end{theorem}
+
+% Definition 122
+\begin{definition}[122]
+$x + 1 = x \cup <x>$.
+\end{definition}
+
+%Let $cy$ denote $\{$ set $y : y \in R$ and $x < y\}$.
+% Theorem 123
+%\begin{theorem}[123]
+%Assume that $cy$ is equal to \{$ set $y : y \in R$ and $x < y\}$.
+%If $x \in R$ then $x + 1$ minimizes $\{$ set $y : y \in R$ and $x < y\}$ in $E$.
+%If $x \in R$ then $x + 1$ minimizes $cy$ in $E$.
+%\end{theorem}
+
+% Theorem 124
+\begin{theorem}[124]
+If $x \in R$ then $\bigcup (x + 1) = x$.
+\end{theorem}
+
+Let $f$ denote a relation.
+% Definition 125
+\begin{definition}
+$f | x = f \cap (x \times \cal{U})$.
+\end{definition}
+
+% Unnumbered
+\begin{lemma}
+$f | x$ is a relation.
+\end{lemma}
+
+Let the restriction of $f$ to $x$ denote $f | x$.
+
+% Theorem 126a
+\begin{theorem}[126a]
+If $f$ is a map then $f | x$ is a map such that $\domain (f | x) = x \cap (\domain f)$.
+%and $(f | x)(y) = f(y)$ for each $y$ such that $y \in \domain (f | x)$).
+\end{theorem}
+
+% Theorem 126b
+\begin{theorem}[126b]
+If $f$ is a map then for each set $y$ if $y \in \domain (f | x)$ then $(f | x)(y) = f(y)$.
+\end{theorem}
+
+Let $f, h$ stand for maps.
+% Theorem 127
+\begin{theorem}[127]
+If $f$ is a map such that $\domain f$ is an ordinal and for each $u$ such that $u \in \domain f$ $f(u) = g(f | u)$
+and $h$ is a map such that $\domain h$ is an ordinal and for each $v$ such that $v \in \domain h$ $h(u) = g(h | u)$
+then $h \subset f$ or $f \subset h$.
+\end{theorem}
+
+% Theorem 128
+\begin{theorem}[128]
+For each $g$ there exists a %unique
+map $f$ such that $\domain f$ is an ordinal
+and for each ordinal number $x$ $f(x) = g(f | x)$.
 \end{theorem}
 
 \end{forthel}

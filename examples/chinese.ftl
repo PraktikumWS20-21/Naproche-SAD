@@ -39,6 +39,7 @@ Proof.
   end.
 qed.
 
+# Here some problems arise with tokenizing away backslash.
 Axiom Cancel.  x != 0 /\ y != 0 => x * y != 0.
 
 Axiom UnNeZr.  1 != 0.
@@ -179,8 +180,8 @@ We have 0,a << <a> and 0,b << <b> (by MulZero, MulUnit).
 Hence there exists a nonzero element of <a> +' <b>.
 Indeed a << <a> +' <b> and b << <a> +' <b> (by AddZero).
 
-% This fails with ContradictoryAxioms, probably due to
-% some weirdness in the parser.
+# This fails with ContradictoryAxioms, probably due to
+# some weirdness in the parser.
 Take a nonzero u << I such that for no nonzero v << I (|v| -<- |u|).
 Proof by contradiction.
     Assume the contrary.

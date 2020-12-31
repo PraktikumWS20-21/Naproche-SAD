@@ -4,11 +4,11 @@ Authors: Andrei Paskevich (2001 - 2008), Steffen Frerix (2017 - 2018)
 Tokenization of input.
 -}
 
-{-# LANGUAGE NamedFieldPuns #-}
 {-# LANGUAGE OverloadedStrings #-}
 
 module SAD.Parser.Token
   ( Token (tokenPos, tokenText)
+  , TexState (InsideForthelEnv, OutsideForthelEnv, TexDisabled)
   , tokensRange
   , showToken
   , isProperToken
@@ -41,6 +41,16 @@ instance Show Token where
 
 data TokenType = NoWhiteSpaceBefore | WhiteSpaceBefore | Comment deriving (Eq, Ord, Show)
 
+-- If at some point one uses a more powerful parser for tokenizing, this should be much
+-- less messy.
+-- | Indicates whether the tokenizer is currently inside a forthel env.
+data TexState = InsideForthelEnv | OutsideForthelEnv | TexDisabled
+
+usingTexParser :: TexState -> Bool
+usingTexParser InsideForthelEnv = True
+usingTexParser OutsideForthelEnv = True
+usingTexParser TexDisabled = False
+
 -- | Make a token with @s@ as @tokenText@ and the range from @p@ to the end of @s@.
 makeToken :: Text -> SourcePos -> TokenType -> Token
 makeToken s pos = Token s (rangePos (SourceRange pos (pos `advanceAlong` s)))
@@ -72,40 +82,55 @@ noTokens = [EOF noSourcePos]
 -- | @tokenize commentChars start text@ takes a list of characters @commentChars@ to use
 -- for comments when used as first character in the line and a @text@ that gets tokenized
 -- starting from the @start@ position.
-tokenize :: [Char] -> SourcePos -> Text -> [Token]
-tokenize commentChars start = posToken start NoWhiteSpaceBefore
+tokenize :: TexState -> SourcePos -> Text -> [Token]
+tokenize texState start = posToken texState start NoWhiteSpaceBefore
   where
-    posToken :: SourcePos -> TokenType -> Text -> [Token]
-    -- Make alphanumeric tokens that don't start with whitespace.
-    posToken pos whitespaceBefore s | not (Text.null lexem) = tok:toks
+    -- Activate the tokenizer when '\begin{forthel}' appears.
+    posToken :: TexState -> SourcePos -> TokenType -> Text -> [Token]
+    posToken OutsideForthelEnv pos _ s = toks
       where
-        (lexem, rest) = Text.span isLexem s
-        tok  = makeToken lexem pos whitespaceBefore
-        toks = posToken (advanceAlong pos lexem) NoWhiteSpaceBefore rest
+        (ignoredText, rest) = Text.breakOn "\\begin{forthel}" s
+        newPos = advanceAlong pos (ignoredText <> "\\begin{forthel}")
+        toks = posToken InsideForthelEnv newPos WhiteSpaceBefore (Text.drop 15 rest)
+    
+    -- Deactivate the tokenizer when '\end{forthel}' appears.
+    posToken InsideForthelEnv pos _ s | start == "\\end{forthel}" = toks
+      where
+        (start,rest) = Text.splitAt 13 s
+        toks = posToken OutsideForthelEnv (advanceAlong pos start) WhiteSpaceBefore rest
+        
+    -- Make alphanumeric tokens that don't start with whitespace.
+    posToken texState pos whitespaceBefore s | not (Text.null lexeme) = tok:toks
+      where
+        (lexeme, rest) = Text.span isLexeme s
+        tok  = makeToken lexeme pos whitespaceBefore
+        toks = posToken texState (advanceAlong pos lexeme) NoWhiteSpaceBefore rest
+    
     -- Process whitespace.
-    posToken pos _ s | not (Text.null white) = toks
+    posToken texState pos _ s | not (Text.null white) = toks
       where
         (white, rest) = Text.span isSpace s
-        toks = posToken (advanceAlong pos white) WhiteSpaceBefore rest
+        toks = posToken texState (advanceAlong pos white) WhiteSpaceBefore rest
+    
     -- Process non-alphanumeric symbol or EOF.
-    posToken pos whitespaceBefore s = case Text.uncons s of
+    posToken texState pos whitespaceBefore s = case Text.uncons s of
       Nothing -> [EOF pos]
-      Just ('$', rest) -> posToken (advanceAlong pos "$") WhiteSpaceBefore rest
-      Just ('"', rest) -> posToken (advanceAlong pos "\"") WhiteSpaceBefore rest
-      Just ('\\', rest) -> posToken (advanceAlong pos "\\") WhiteSpaceBefore rest
-      Just (c, _) | elem c commentChars -> tok:toks
+      Just ('$', rest) -> posToken texState (advanceAlong pos "$") WhiteSpaceBefore rest
+      Just ('"', rest) -> posToken texState (advanceAlong pos "\"") WhiteSpaceBefore rest
+      Just ('\\', rest) -> posToken texState (advanceAlong pos "\\") WhiteSpaceBefore rest
+      Just (c, _) | if usingTexParser texState then c == '%' else c == '#' -> tok:toks
         where
           (comment, rest) = Text.break (== '\n') s
           tok  = makeToken comment pos Comment
-          toks = posToken (advanceAlong pos comment) whitespaceBefore rest
+          toks = posToken texState (advanceAlong pos comment) whitespaceBefore rest
       Just (c, cs) -> tok:toks
         where
           tok  = makeToken (Text.singleton c) pos whitespaceBefore
-          toks = posToken (advancePos pos c) NoWhiteSpaceBefore cs
+          toks = posToken texState (advancePos pos c) NoWhiteSpaceBefore cs
 
 
-isLexem :: Char -> Bool
-isLexem c = isAscii c && isAlphaNum c
+isLexeme :: Char -> Bool
+isLexeme c = (isAscii c && isAlphaNum c) || c == '_'
 
 reportComments :: Token -> Maybe Message.Report
 reportComments t@Token{}
@@ -113,7 +138,7 @@ reportComments t@Token{}
   | otherwise = Just (tokenPos t, Markup.comment1)
 reportComments EOF{} = Nothing
 
--- | Append tokens seperated by a single space if they were seperated
+-- | Append tokens separated by a single space if they were separated
 -- by whitespace before.
 composeTokens :: [Token] -> Text
 composeTokens = Text.concat . dive

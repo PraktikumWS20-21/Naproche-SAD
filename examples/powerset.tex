@@ -23,7 +23,7 @@
 \maketitle 
 \section{First and only section}
 
-NOTE: This example doesn't work because set was replaced with class.
+NOTE: This example doesn't work because class was replaced with class.
 
 \begin{theorem}
 This is not parsed by forthel.
@@ -33,7 +33,7 @@ This is not parsed by forthel.
 [synonym subset/-s]
 [synonym surject/-s]
 
-Let M denote a set.
+Let M denote a class.
 Let f denote a function.
 
 Let the value of f at x stand for f[x].
@@ -42,15 +42,15 @@ Let the domain of f stand for Dom(f).
 
 
 \begin{axiom}
-The value of f at any element of the domain of f is a set.
+The value of f at any element of the domain of f is a class.
 \end{axiom}
 
 \begin{definition}[subset]
-A subset of M is a set N such that every element of N is an element of M.
+A subset of M is a class N such that every element of N is an element of M.
 \end{definition}
 
 \begin{definition}
-The powerset of M is the set of subsets of M.
+The powerset of M is the class of subsets of M.
 \end{definition}
 
 \begin{definition}
@@ -60,7 +60,8 @@ f surjects onto M iff every element of M is equal to the value of f at some elem
 \begin{proposition}
 No function that is defined on M surjects onto the powerset of M.
 \end{proposition}
-\begin{proof} (By contradiction)
+\begin{proof}
+Proof by contradiction.
 Assume the contrary. Take a function f that is defined on M and surjects onto the powerset of M.
 Define $N = \{ x in M | x is not an element of f[x] \}$.
 Then N is not equal to the value of f at any element of M.
@@ -68,8 +69,9 @@ Contradiction.
 \end{proof}
 
 \begin{theorem}
-The value of f at any element of the domain of f is a set.
+The value of f at any element of the domain of f is a class.
 \end{theorem}
+
 \end{forthel}
 
 \end{document}

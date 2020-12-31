@@ -98,7 +98,7 @@ x * (y + z) = (x * y) + (x * z).
 \end{axiom}
 
 \begin{axiom}[MulMnOne]
-$1 * x = -x = x * -1$.
+1 * x = -x = x * -1.
 \end{axiom}
 
 \begin{lemma}[MulZero]

@@ -1,6 +1,5 @@
 {-
 Authors: Andrei Paskevich (2001 - 2008), Steffen Frerix (2017 - 2018), Makarius Wenzel (2018)
-
 Main application entry point: console or server mode.
 -}
 
@@ -15,6 +14,7 @@ import Data.IORef
 import Data.Maybe (fromMaybe)
 import Data.Time (UTCTime, addUTCTime, getCurrentTime, diffUTCTime)
 import Data.ByteString (ByteString)
+import Data.List (isSuffixOf)
 
 import qualified Control.Exception as Exception
 import qualified Data.Text.Lazy as Text
@@ -49,30 +49,37 @@ main  = do
 
   -- command line and init file
   args0 <- Environment.getArgs
-  (opts0, text0) <- readArgs args0
+  (opts0, pk, mFileName) <- readArgs args0
+  text0 <- (map (uncurry ProofTextInstr) (reverse opts0) ++) <$> case mFileName of
+    Nothing -> do
+      stdin <- getContents
+      pure $ [ProofTextInstr noPos $ GetArgument (Text pk) (Text.pack stdin)]
+    Just f -> do
+      pure $ [ProofTextInstr noPos $ GetArgument (File pk) (Text.pack f)]
+  let opts1 = map snd opts0
 
   oldProofTextRef <- newIORef $ ProofTextRoot []
 
-  if askFlag Help False opts0 then
+  if askFlag Help False opts1 then
     putStr (GetOpt.usageInfo usageHeader options)
   else -- main body with explicit error handling, notably for PIDE
     Exception.catch
-      (if askFlag Server False opts0 then
+      (if askFlag Server False opts1 then
         Server.server (Server.publish_stdout "Naproche-SAD") (serverConnection oldProofTextRef args0)
-      else do consoleThread; mainBody Nothing oldProofTextRef (opts0, text0))
+      else do consoleThread; mainBody Nothing oldProofTextRef opts1 text0 mFileName)
       (\err -> do
         exitThread
         let msg = Exception.displayException (err :: Exception.SomeException)
         IO.hPutStrLn IO.stderr msg
         Exit.exitFailure)
 
-mainBody :: Maybe ByteString -> IORef ProofText -> ([Instr], [ProofText]) -> IO ()
-mainBody proversYaml oldProofTextRef (opts0, text0) = do
+mainBody :: Maybe ByteString -> IORef ProofText -> [Instr] -> [ProofText] -> Maybe FilePath -> IO ()
+mainBody proversYaml oldProofTextRef opts0 text0 fileName = do
   startTime <- getCurrentTime
 
   oldProofText <- readIORef oldProofTextRef
   -- parse input text
-  txts <- readProofText (askFlag Tex False opts0) (askArgument Library "." opts0) text0
+  txts <- readProofText (askArgument Library "." opts0) text0
   let text1 = ProofTextRoot txts
 
   case askTheory FirstOrderLogic opts0 of
@@ -80,7 +87,7 @@ mainBody proversYaml oldProofTextRef (opts0, text0) = do
       -- if -T / --onlytranslate is passed as an option, only print the translated text
       if askFlag OnlyTranslate False opts0
         then showTranslation txts startTime
-        else do proveFOL proversYaml text1 opts0 oldProofText oldProofTextRef startTime
+        else do proveFOL proversYaml text1 opts0 oldProofText oldProofTextRef startTime fileName
     CiC -> return ()
     Lean -> exportLean text1
 
@@ -107,8 +114,8 @@ exportLean pt = do
     Right t -> putStrLn $ Text.unpack t
   return ()
 
-proveFOL :: Maybe ByteString -> ProofText -> [Instr] -> ProofText -> IORef ProofText -> UTCTime -> IO ()
-proveFOL proversYaml text1 opts0 oldProofText oldProofTextRef startTime = do
+proveFOL :: Maybe ByteString -> ProofText -> [Instr] -> ProofText -> IORef ProofText -> UTCTime -> Maybe FilePath -> IO ()
+proveFOL proversYaml text1 opts0 oldProofText oldProofTextRef startTime fileName = do
   -- read provers.yaml
   provers <- case proversYaml of
     Nothing -> readProverFile $ Text.unpack (askArgument Provers "provers.yaml" opts0)
@@ -121,7 +128,7 @@ proveFOL proversYaml text1 opts0 oldProofText oldProofTextRef startTime = do
   success <- case findParseError text1 of
     Nothing -> do
       let text = textToCheck oldProofText text1
-      (success, newProofText) <- verify (askArgument File "" opts0) provers reasonerState text
+      (success, newProofText) <- verify (maybe "" Text.pack fileName) provers reasonerState text
       mapM_ (writeIORef oldProofTextRef) newProofText
       pure success
     Just err -> do errorParser (errorPos err) (show err); pure False
@@ -190,10 +197,12 @@ serverConnection oldProofTextRef args0 connection = do
         exitThread
         (do
           let args1 = lines (fromMaybe "" (Properties.get props Naproche.command_args))
-          (opts1, text0) <- readArgs (args0 ++ args1)
-          let text1 = text0 ++ [ProofTextInstr noPos (GetArgument Text (Text.pack $ XML.content_of body))]
+          (opts0, pk, fileName) <- readArgs (args0 ++ args1)
+          let opts1 = map snd opts0
+          let text0 = map (uncurry ProofTextInstr) (reverse opts0)
+          let text1 = text0 ++ [ProofTextInstr noPos (GetArgument (Text pk) (Text.pack $ XML.content_of body))]
 
-          Exception.catch (mainBody Nothing oldProofTextRef (opts1, text1))
+          Exception.catch (mainBody Nothing oldProofTextRef opts1 text1 fileName)
             (\err -> do
               let msg = Exception.displayException (err :: Exception.SomeException)
               Exception.catch
@@ -204,26 +213,26 @@ serverConnection oldProofTextRef args0 connection = do
 
     _ -> return ()
 
-
 -- Command line parsing
 
-readArgs :: [String] -> IO ([Instr], [ProofText])
+readArgs :: [String] -> IO ([(Pos, Instr)], ParserKind, Maybe FilePath)
 readArgs args = do
   let (instrs, files, errs) = GetOpt.getOpt GetOpt.Permute options args
 
   let fail msgs = errorWithoutStackTrace (unlines (map trim_line msgs))
   unless (null errs) $ fail errs
-  commandLine <- case files of
-                  [file] -> return $ instrs ++ [GetArgument File (Text.pack file)]
-                  [] -> return instrs
+
+  initFile <- readInit (askArgument Init "init.opt" instrs)
+  let initialOpts = initFile ++ map (noPos,) instrs
+
+  let revInitialOpts = reverse initialOpts
+  let useTexArg = askFlag UseTex False $ map snd revInitialOpts
+  let fileName = case files of
+                  [file] -> Just file
+                  [] -> Nothing
                   _ -> fail ["More than one file argument\n"]
-
-  initFile <- readInit (askArgument Init "init.opt" commandLine)
-  let initialOpts = initFile ++ map (noPos,) commandLine
-
-  let revInitialOpts = map snd $ reverse initialOpts
-  let initialProofText = map (uncurry ProofTextInstr) initialOpts
-  return (revInitialOpts, initialProofText)
+  let parserKind = if useTexArg || maybe False (".tex.ftl" `isSuffixOf`) fileName then Tex else NonTex
+  pure (revInitialOpts, parserKind, fileName)
 
 usageHeader :: String
 usageHeader =
@@ -310,7 +319,7 @@ options = [
     (GetOpt.ReqArg (SetFlag Dump . parseConsent) "{on|off}")
     "print tasks in prover's syntax (def: off)",
   GetOpt.Option "" ["tex"]
-    (GetOpt.ReqArg (SetFlag Tex . parseConsent) "{on|off}")
+    (GetOpt.ReqArg (SetFlag UseTex . parseConsent) "{on|off}")
     "parse passed file with forthel tex parser (def: off)"
   ]
 
